@@ -19,6 +19,9 @@ defmodule Haven.Mixfile do
   # To specify particular versions, regardless of the tag, do:
   # { :barbat, "~> 0.1", github: "elixir-lang/barbat" }
   defp deps do
-    []
+    [
+     # {:ewebmachine,"0.0.2",[github: "awetzel/ewebmachine"]},
+     {:webmachine,"1.10.3",[github: "basho/webmachine", tag: "1.10.3"]}
+    ]
   end
 end
