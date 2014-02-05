@@ -18,6 +18,7 @@ defmodule Haven.Mixfile do
 
   defp deps do
     [ { :cowboy, github: "extend/cowboy" },
-      { :dynamo, "~> 0.1.0-dev", github: "elixir-lang/dynamo" } ]
+      { :dynamo, "~> 0.1.0-dev", github: "elixir-lang/dynamo" },
+      { :ex_doc, github: "elixir-lang/ex_doc" }  ]
   end
 end
