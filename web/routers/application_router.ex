@@ -1,5 +1,6 @@
 defmodule ApplicationRouter do
   use Dynamo.Router
+  filter JSON.Dynamo.Filter
 
   prepare do
     conn.put_resp_header "Content-Type", "application/json"
@@ -15,7 +16,6 @@ defmodule ApplicationRouter do
   end
 
   get "/somejson" do
-    conn.resp(200, JSON.encode!([message: "welcome to jsonified haven!"]))
-    # conn.resp(200, "{\"message\": \"welcome to jsonified haven!\"}")
+    conn.put_private :result_object, [message: "welcome to jsonified haven with a FILTER!"]
   end
 end
