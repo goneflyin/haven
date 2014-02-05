@@ -15,6 +15,6 @@ defmodule ApplicationRouter do
   end
 
   get "/somejson" do
-    conn.resp(200, "{\"message\": \"Pretend this is real JSON\"}")
+    conn.resp(200, JSON.generate [message: "welcome to jsonified haven!"])
   end
 end

@@ -2,6 +2,7 @@
   "cowlib": {:git, "git://github.com/extend/cowlib.git", "63298e8e160031a70efff86a1acde7e7db1fcda6", [ref: "0.4.0"]},
   "dynamo": {:git, "git://github.com/elixir-lang/dynamo.git", "5f45a150a914c86cf17f2b69c158ef5987884664", []},
   "ex_doc": {:git, "git://github.com/elixir-lang/ex_doc.git", "aecbe8cf755fc81d76e2924d69a33642b7945af9", []},
+  "exjson": {:git, "https://github.com/guedes/exjson.git", "bd9dcb7e78c2344bb491098405f2b81d53979dcd", []},
   "hackney": {:git, "git://github.com/benoitc/hackney.git", "7f2a0b5996313d930277786e7ff5d538e9346547", [tag: "0.10.1"]},
   "hackney_lib": {:git, "https://github.com/benoitc/hackney_lib.git", "eecdb481f1d38bfb194896bffdf9bdcdd967ae96", [tag: "0.2.2"]},
   "mime": {:git, "git://github.com/dynamo/mime.git", "7e56a3dd5692afcd39c9797ae2898c5841967098", []},
