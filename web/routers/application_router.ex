@@ -16,4 +16,8 @@ defmodule ApplicationRouter do
     conn = conn.assign(:title, "Welcome to Dynamo!")
     render conn, "index.html"
   end
+
+  get "/somejson" do
+    conn.resp(200, "{message: \"Pretend this is real JSON\"}")
+  end
 end
