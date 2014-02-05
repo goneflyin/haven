@@ -1,3 +1,0 @@
-# Haven
-
-** TODO: Add description **
