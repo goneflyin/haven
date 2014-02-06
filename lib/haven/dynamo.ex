@@ -13,7 +13,7 @@ defmodule Haven.Dynamo do
 
     # The route from which static assets are served
     # You can turn off static assets by setting it to false
-    static_route: "/static"
+    static_route: false
 
   # Uncomment the lines below to enable the cookie session store
   # config :dynamo,
@@ -21,9 +21,4 @@ defmodule Haven.Dynamo do
   #   session_options:
   #     [ key: "_haven_session",
   #       secret: "EEufPhPvIaAnuk3ryQ4i27JQpEgmipMNLIY/fnRul7Z7XLwSyQc3SY8/LhfZyFR7"]
-
-  # Default functionality available in templates
-  templates do
-    use Dynamo.Helpers
-  end
 end
