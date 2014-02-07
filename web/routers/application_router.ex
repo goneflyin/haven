@@ -2,6 +2,8 @@ defmodule ApplicationRouter do
   use Dynamo.Router
   filter JSON.Dynamo.Filter
 
+  forward "/register", to: RegistrarRouter
+
   prepare do
     conn.put_resp_header "Content-Type", "application/json"
   end
