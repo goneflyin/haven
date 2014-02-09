@@ -2,18 +2,10 @@ defmodule ApplicationRouter do
   use Dynamo.Router
   filter JSON.Dynamo.Filter
 
-  forward "/register", to: RegistrarRouter
-
-  prepare do
-    conn.put_resp_header "Content-Type", "application/json"
-  end
-
-  # It is common to break your Dynamo into many
-  # routers, forwarding the requests between them:
-  # forward "/posts", to: PostsRouter
+  forward "/services", to: RegistrarRouter
 
   get "/" do
-    conn = conn.assign(:title, "Welcome to Dynamo!")
+    conn = conn.assign(:title, "Welcome to Haven!")
     render conn, "index.html"
   end
 
