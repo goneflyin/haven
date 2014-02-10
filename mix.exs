@@ -12,8 +12,9 @@ defmodule Haven.Mixfile do
 
   # Configuration for the OTP application
   def application do
-    [ applications: [:cowboy, :dynamo],
-      mod: { Haven, [] } ]
+    [ registered: [:registry],
+      applications: [:cowboy, :dynamo],
+      mod: { Haven, [ registry: [:shopping_cart_svc, :identity_api, :collections_svc] ] } ]
   end
 
   defp deps do
