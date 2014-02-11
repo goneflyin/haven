@@ -1,6 +1,7 @@
 defmodule RegistrarRouter do
   use Dynamo.Router
 
+  alias Haven.Registry, as: Registry
   prepare do
     conn
     |> fetch([:params, :body, :headers])
@@ -14,11 +15,27 @@ defmodule RegistrarRouter do
   end
 
   post "/" do
-    conn.resp(200, create_response(conn.req_body))
+    svc = add_service(JSON.decode(conn.req_body))
+    conn.resp 200, JSON.encode!(Haven.Registry.dump())
+  end
+
+  get "/:name" do
+    IO.puts "GET /#{conn.params[:name]}"
+    json = Registry.get_services(conn.params[:name]) |> Registry.to_hash |> JSON.encode!
+    conn.resp 200, json
   end
 
   get "/headers" do
     conn.put_private :result_object, conn.fetch(:headers).req_headers
+  end
+
+  defp add_service({:ok, service}) do
+    Registry.from_hash(service)
+      |> Registry.add_service
+  end
+  defp add_service({error, data}) do
+    IO.puts "got an error [#{error}] decoding service json!"
+    IO.puts "got some data with the error: #{data}"
   end
 
   def create_response(body) do
