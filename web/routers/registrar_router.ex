@@ -21,7 +21,7 @@ defmodule RegistrarRouter do
 
   get "/:name" do
     IO.puts "GET /#{conn.params[:name]}"
-    json = Registry.get_services(conn.params[:name]) |> Registry.to_hash |> JSON.encode!
+    json = Registry.get_services_by_name(conn.params[:name]) |> Registry.to_hash |> JSON.encode!
     conn.resp 200, json
   end
 

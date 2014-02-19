@@ -6,8 +6,12 @@ defmodule Haven.Registry do
     :gen_server.cast(:registry, { :add, svc })
   end
 
-  def get_services(name) do
-    :gen_server.call(:registry, { :get, name })
+  def get_services_by_name(name) do
+    :gen_server.call(:registry, { :get_by_name, name })
+  end
+
+  def get_services_by_uri(url) do
+    :gen_server.call(:registry, { :get_by_uri, url })
   end
 
   def dump do
