@@ -1,6 +1,17 @@
 defmodule Haven.Registry.Server do
   use GenServer.Behaviour
 
+  @moduledoc """
+  Holds the set of Services and Service Instances that are registered with Haven
+  and eligible to have traffic routed to them.
+
+  A Service has a name as well as a set of URIs that it serves. Each Service can
+  have 1 or more Instances which provide the service. For example:
+
+  Service[name=collections_svc, uris=["/collections"]
+    Instance[host=1.2.3.4, port=9000]
+    Instance[host=1.2.3.4, port=9001]
+  """
   alias Haven.Registry.Service
 
   def start_link(services) do
@@ -40,8 +51,11 @@ defmodule Haven.Registry.Server do
     { :noreply, { HashDict.put(services_by_name, service.name, svcs), services_by_uri } }
   end
 
-  def for_uri(uri, s) do
+  def for_uri(uri, s) when is_binary(uri) do
     _for_uri(String.split(uri, "/", trim: true), s, [])
+  end
+  def for_uri(uri, s) when is_list(uri) do
+    _for_uri(uri, s, [])
   end
 
   def _for_uri("", s, answer) do
@@ -55,11 +69,11 @@ defmodule Haven.Registry.Server do
     _for_uri(rest, s, answer)
   end
   def _for_uri([root | []], s, answer) do
-    node_for_root = HashDict.get(s, root, answer)
+    node_for_root = HashDict.get(s, root, HashDict.new)
     _for_uri("", node_for_root, answer)
   end
   def _for_uri([root | rest], s, answer) do
-    node_for_root = HashDict.get(s, root, answer)
+    node_for_root = HashDict.get(s, root, HashDict.new)
     _for_uri(rest, node_for_root, answer)
   end
 
