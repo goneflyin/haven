@@ -6,6 +6,7 @@ defmodule Haven do
   application and its Dynamos.
   """
   def start(_type, args) do
+    Enum.each [:ssl, :ibrowse], &Application.Behaviour.start(&1)
     start_registry(args[:registry])
     # TODO: Eventually need to have a single root supervisor and include
     #   the Dynamo and Registry supervisors both in that supervisor tree.

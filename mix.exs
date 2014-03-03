@@ -18,9 +18,11 @@ defmodule Haven.Mixfile do
   end
 
   defp deps do
-    [ { :cowboy, github: "extend/cowboy" },
-      { :dynamo, "~> 0.1.0-dev", github: "elixir-lang/dynamo" },
-      { :json,   github: "cblage/elixir-json"},
-      { :ex_doc, github: "elixir-lang/ex_doc" }  ]
+    [ { :cowboy,                    github: "extend/cowboy" },
+      { :dynamo,    "~> 0.1.0-dev", github: "elixir-lang/dynamo" },
+      { :json,                      github: "cblage/elixir-json"},
+      { :httpotion, "~> 0.2.3",     github: "myfreeweb/httpotion" },
+      { :ex_doc,                    github: "elixir-lang/ex_doc" },
+      { :apex,      "~>0.0.1",      github: "BjRo/apex"} ]
   end
 end
