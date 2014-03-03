@@ -25,10 +25,6 @@ defmodule RegistrarRouter do
     conn.resp 200, json
   end
 
-  get "/headers" do
-    conn.put_private :result_object, conn.fetch(:headers).req_headers
-  end
-
   defp add_service({:ok, service}) do
     Registry.from_hash(service)
       |> Registry.add_service
@@ -49,10 +45,18 @@ defmodule RegistrarRouter do
   end
 
   defp require_content_type_json(conn) do
-    if conn.req_headers["content-type"] == "application/json" do
-      conn
-    else
-      halt!(conn.status(422).put_private(:result_object, [message: "content must be in JSON and content-type header must be set"]))
+    case require_content_type(conn, "application/json") do
+      :ok ->
+        conn
+      :error ->
+        halt!(conn.status(422).put_private(:result_object, [message: "content must be in JSON and content-type header must be set"]))
+    end
+  end
+
+  defp require_content_type(conn, type) do
+    case conn.req_headers["content-type"] do
+      nil -> :ok
+      val -> if String.contains?(val, type), do: :ok, else: :missing
     end
   end
 
