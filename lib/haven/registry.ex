@@ -3,6 +3,10 @@ defmodule Haven.Registry do
   defrecord Service, name: nil, uris: [], host: "127.0.0.1", port: 8888
   # defrecord Instance, name: nil, uris: [], host: "127.0.0.1", port: 8888
 
+  def clear do
+    :gen_server.cast(:registry, :clear)
+  end
+
   def add_service(svc = Service[]) do
     :gen_server.cast(:registry, { :add, svc })
   end

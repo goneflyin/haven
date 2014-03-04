@@ -41,6 +41,9 @@ defmodule Haven.Registry.Server do
     { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_name, services_by_uri} }
   end
 
+  def handle_cast(:clear, {_, _}) do
+    { :noreply, { HashDict.new, HashDict.new } }
+  end
   def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_name, services_by_uri}) do
     # TODO: verify service instance is not already registered
     svcs = [ service | HashDict.get(services_by_name, svc_name, []) ]
