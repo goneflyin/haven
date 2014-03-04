@@ -58,8 +58,11 @@ defmodule Haven.Registry.Server do
     _for_uri(uri, s, [])
   end
 
-  def _for_uri("", s, answer) do
+  def _for_uri([], s, answer) do
     HashDict.get(s, "", answer)
+  end
+  def _for_uri("", s, answer) do
+    _for_uri([], s, answer)
   end
   def _for_uri(["" | rest], s, answer) do
     answer = case HashDict.get(s, "") do

@@ -7,7 +7,7 @@ defmodule ApplicationRouter do
   forward "/services", to: RegistrarRouter
 
   match "/*" do
-    response = Registry.get_services_by_uri(conn.path_info_segments())
+    Registry.get_services_by_uri(conn.path_info_segments())
       |> handle(conn)
     # conn.resp 200, "Would forward to: #{conn.path_info_segments()}"
   end
@@ -22,7 +22,7 @@ defmodule ApplicationRouter do
     scheme = conn.scheme
     url = '#{conn.scheme}://#{host}:#{port}'
     headers = conn.req_headers
-    cookies = conn.req_cookies
+    # cookies = conn.req_cookies
     body = conn.req_body
     method = conn.method
     IO.puts "Url:"

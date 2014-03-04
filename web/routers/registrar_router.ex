@@ -11,11 +11,11 @@ defmodule RegistrarRouter do
   end
 
   get "/" do
-    conn.put_private :result_object, [message: "from RegistrarRouter /register"]
+    conn.resp 200, "foo"
   end
 
   post "/" do
-    svc = add_service(JSON.decode(conn.req_body))
+    add_service(JSON.decode(conn.req_body))
     conn.resp 200, JSON.encode!(Haven.Registry.dump())
   end
 
@@ -35,9 +35,9 @@ defmodule RegistrarRouter do
   end
 
   def create_response(body) do
-    body = JSON.decode(body)
-             |> handle_decode
-             |> JSON.encode!
+    JSON.decode(body)
+      |> handle_decode
+      |> JSON.encode!
   end
 
   defp fetch(conn, to_fetch) do
