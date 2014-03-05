@@ -6,19 +6,22 @@ defmodule ApplicationRouter do
   alias Haven.Registry
   alias Haven.Registry.Service
 
+  @header "X-Haven-REST-Proxy"
+
   forward "/services", to: RegistrarRouter
 
   match "/*" do
+    conn = conn.put_resp_header(@header, "true")
+    # Apex.ap conn.resp_headers
     Registry.get_services_by_uri(conn.path_info_segments())
       |> handle(conn)
     # conn.resp 200, "Would forward to: #{conn.path_info_segments()}"
   end
 
   def handle([], conn) do
-    conn.resp 200, "Nothing to forward to!"
+    conn.status(418)
   end
   def handle([service = Service[host: host, port: port] | _], conn) do
-    IO.puts "Service found for forwarding!"
     Apex.ap service
     conn = conn.fetch([:cookies, :params, :headers, :body])
     scheme = conn.scheme
@@ -32,8 +35,7 @@ defmodule ApplicationRouter do
     IO.puts "Headers: "
     Apex.ap headers
     IO.puts "Method: #{inspect method}"
-    IO.puts "Body:"
-    Apex.ap body
+    IO.puts "Body: #{inspect body}"
     # IEx.pry
     res = :ibrowse.send_req(url, headers, method, body)
     IO.puts "did it and got..."
