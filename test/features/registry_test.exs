@@ -23,4 +23,13 @@ defmodule RegistryTest do
     assert(Registry.get_services_by_name("coll_svc") == [coll_svc])
     assert(Registry.get_services_by_uri("/collections") == [coll_svc])
   end
+
+  test "adding same service twice only creates single entry" do
+    coll_svc = Service.new(name: "coll_svc", port: 1234, host: "1.4.9.16", uris: ["/collections", "/other"])
+    Registry.add_service(coll_svc)
+    Registry.add_service(coll_svc)
+
+    assert(Registry.get_services_by_name("coll_svc") == [coll_svc])
+    assert(Registry.get_services_by_uri("/collections") == [coll_svc])
+  end
 end

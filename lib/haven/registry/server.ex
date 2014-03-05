@@ -29,7 +29,7 @@ defmodule Haven.Registry.Server do
   end
 
   def handle_call({:get_by_name, svc_name}, _from, {services_by_name, services_by_uri}) do
-    { :reply, HashDict.get(services_by_name, svc_name, []), {services_by_name, services_by_uri} }
+    { :reply, for_name(services_by_name, svc_name), {services_by_name, services_by_uri} }
   end
   def handle_call({:get_by_uri, uri}, _from, {services_by_name, services_by_uri}) do
     { :reply, for_uri(uri, services_by_uri), {services_by_name, services_by_uri} }
@@ -45,13 +45,17 @@ defmodule Haven.Registry.Server do
     { :noreply, { HashDict.new, HashDict.new } }
   end
   def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_name, services_by_uri}) do
-    # TODO: verify service instance is not already registered
+    # for_name(services_by_name, svc_name)
     svcs = [ service | HashDict.get(services_by_name, svc_name, []) ]
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
     services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
     # first_uri = List.first(svc_uris)
     # services_by_uri = add_for_uri(first_uri, service, services_by_uri)
     { :noreply, { HashDict.put(services_by_name, service.name, svcs), services_by_uri } }
+  end
+
+  def for_name(s, name) do
+    HashDict.get(s, name, [])
   end
 
   def for_uri(uri, s) when is_binary(uri) do

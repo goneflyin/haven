@@ -1,3 +1,5 @@
+require IEx
+
 defmodule ApplicationRouter do
   use Dynamo.Router
 
@@ -20,25 +22,31 @@ defmodule ApplicationRouter do
     Apex.ap service
     conn = conn.fetch([:cookies, :params, :headers, :body])
     scheme = conn.scheme
-    url = '#{conn.scheme}://#{host}:#{port}'
-    headers = conn.req_headers
+    url = '#{conn.scheme}://#{host}:#{port}#{conn.path}?#{conn.query_string}'
+    headers = convert_keys_to_atoms conn.req_headers
     # cookies = conn.req_cookies
     body = conn.req_body
-    method = conn.method
-    IO.puts "Url:"
-    Apex.ap url
-    IO.puts "Scheme:"
-    Apex.ap scheme
-    IO.puts "Headers:"
+    method = conn.method |> String.downcase |> binary_to_atom
+    IO.puts "Url: #{inspect url}"
+    IO.puts "Scheme: #{inspect scheme}"
+    IO.puts "Headers: "
     Apex.ap headers
-    IO.puts "Method:"
-    Apex.ap method
+    IO.puts "Method: #{inspect method}"
     IO.puts "Body:"
     Apex.ap body
+    # IEx.pry
     res = :ibrowse.send_req(url, headers, method, body)
     IO.puts "did it and got..."
-    Apex.ap res
+    IO.inspect res
     conn.resp 200, "dunno what im a doin here"
+  end
+
+  def convert_keys_to_atoms([]), do: []
+  def convert_keys_to_atoms([{dynamo_header_key, dynamo_header_value} | rest]) do
+    [{binary_to_atom(dynamo_header_key), dynamo_header_value} | convert_keys_to_atoms(rest)]
+  end
+  def convert_keys_to_atoms(dict) do
+    convert_keys_to_atoms(Binary.Dict.to_list(dict))
   end
 
 end
