@@ -1,16 +1,14 @@
-defmodule RegistryTest do
+defmodule IndexTest do
   use Haven.TestCase
 
-  alias Haven.Registry
-  alias Haven.Registry.Service
+  alias Haven.Registry.Index
+  alias Haven.Registry.Index.Service
+  alias Haven.Registry.Index.Instance
 
-  setup do
-    Registry.clear
+
+  test "getting service for name when empty should return empty list" do
+    assert(Index.get_service_for_name({nil, nil}, "not_there_svc") == [])
   end
-
-  # test "getting service by name when empty should return empty list" do
-  #   assert(Registry.get_services_by_name("coll_svc") == [])
-  # end
 
   # test "getting service by uri when empty should return empty list" do
   #   assert(Registry.get_services_by_name("/coll") == [])
