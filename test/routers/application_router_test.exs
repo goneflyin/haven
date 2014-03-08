@@ -9,6 +9,6 @@ defmodule ApplicationRouterTest do
 
   test "returns OK" do
     conn = get("/")
-    assert conn.status == 200
+    assert conn.status == 418
   end
 end
