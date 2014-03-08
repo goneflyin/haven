@@ -13,7 +13,7 @@ defmodule Haven.Mixfile do
   # Configuration for the OTP application
   def application do
     [ registered: [:registry],
-      applications: [:cowboy, :dynamo],
+      applications: [:crypto, :public_key, :ssl, :cowboy, :dynamo],
       mod: { Haven, [ registry: [:shopping_cart_svc, :identity_api, :collections_svc] ] } ]
   end
 

@@ -19,3 +19,9 @@ config :dynamo,
 
 # Run on port 4000 for development
 config :server, port: 4000
+
+config :ssl,
+  port: 4001,
+  keyfile: "priv/ssl/key.pem",
+  certfile: "priv/ssl/cert.pem",
+  password: "cowboy"
