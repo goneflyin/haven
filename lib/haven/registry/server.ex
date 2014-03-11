@@ -14,41 +14,41 @@ defmodule Haven.Registry.Server do
   """
   alias Haven.Registry.Service
 
-  def start_link(services) do
+  def start_link(store_pid) do
     # In Supervisor, the worker is specified by Haven.Registry.Server module
     # passing services as an argument.
     # Therefore, the supervisor will (by default) invoke the
     # Haven.Registry.Server.start_link(stack) function to START the worker.
     # Prefacing the args with {:local, :registry} causes the server to be
     # registered as :registry in the local node.
-    :gen_server.start_link({ :local, :registry }, __MODULE__, services, [])
+    :gen_server.start_link({ :local, :registry }, __MODULE__, store_pid, [])
   end
 
-  def init(_services) do
-    { :ok, {HashDict.new, HashDict.new} }
+  def init(store_pid) do
+    { :ok, {HashDict.new, HashDict.new, store_pid} }
   end
 
-  def handle_call({:get_by_name, svc_name}, _from, {services_by_name, services_by_uri}) do
-    { :reply, for_name(services_by_name, svc_name), {services_by_name, services_by_uri} }
+  def handle_call({:get_by_name, svc_name}, _from, {services_by_name, services_by_uri, store_pid}) do
+    { :reply, for_name(services_by_name, svc_name), {services_by_name, services_by_uri, store_pid} }
   end
-  def handle_call({:get_by_uri, uri}, _from, {services_by_name, services_by_uri}) do
-    { :reply, for_uri(uri, services_by_uri), {services_by_name, services_by_uri} }
+  def handle_call({:get_by_uri, uri}, _from, {services_by_name, services_by_uri, store_pid}) do
+    { :reply, for_uri(uri, services_by_uri), {services_by_name, services_by_uri, store_pid} }
   end
-  def handle_call(:dump, _from, {services_by_name, services_by_uri}) do
-    { :reply, {services_by_name, services_by_uri}, {services_by_name, services_by_uri} }
+  def handle_call(:dump, _from, {services_by_name, services_by_uri, store_pid}) do
+    { :reply, {services_by_name, services_by_uri}, {services_by_name, services_by_uri, store_pid} }
   end
-  def handle_call(unknown, _from, {services_by_name, services_by_uri}) do
-    { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_name, services_by_uri} }
+  def handle_call(unknown, _from, {services_by_name, services_by_uri, store_pid}) do
+    { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_name, services_by_uri, store_pid} }
   end
 
-  def handle_cast(:clear, {_, _}) do
-    { :noreply, { HashDict.new, HashDict.new } }
+  def handle_cast(:clear, {_, _, store_pid}) do
+    { :noreply, { HashDict.new, HashDict.new, store_pid } }
   end
-  def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_name, services_by_uri}) do
+  def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_name, services_by_uri, store_pid}) do
     svcs = [ service | HashDict.get(services_by_name, svc_name, []) ]
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
     services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
-    { :noreply, { HashDict.put(services_by_name, service.name, svcs), services_by_uri } }
+    { :noreply, { HashDict.put(services_by_name, service.name, svcs), services_by_uri, store_pid } }
   end
 
   def for_name(s, name) do

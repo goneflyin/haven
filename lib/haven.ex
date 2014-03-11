@@ -14,7 +14,7 @@ defmodule Haven do
   end
 
   def start_registry(registry_args) do
-    Haven.Registry.Supervisor.start_link(registry_args)
+    Haven.Supervisor.start_link([])
   end
 
 end

@@ -1,4 +1,4 @@
-require IEx
+# require IEx
 
 defmodule ApplicationRouter do
   use Dynamo.Router

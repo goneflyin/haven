@@ -10,10 +10,6 @@ defmodule RegistrarRouter do
 
   end
 
-  get "/" do
-    conn.resp 200, "foo"
-  end
-
   post "/" do
     add_service(JSON.decode(conn.req_body))
     conn.resp 200, JSON.encode!(Haven.Registry.dump())
