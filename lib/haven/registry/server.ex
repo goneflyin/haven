@@ -14,6 +14,9 @@ defmodule Haven.Registry.Server do
   """
   alias Haven.Registry.Service
 
+  ##########################
+  # External API
+  ##########################
   def start_link(store_pid) do
     # In Supervisor, the worker is specified by Haven.Registry.Server module
     # passing services as an argument.
@@ -24,15 +27,21 @@ defmodule Haven.Registry.Server do
     :gen_server.start_link({ :local, :registry }, __MODULE__, store_pid, [])
   end
 
+  ##########################
+  # GenServer Implementation
+  ##########################
   def init(store_pid) do
-    { :ok, {HashDict.new, HashDict.new, store_pid} }
+    { services_by_name, services_by_uri } = Haven.Registry.Store.fetch_registry(store_pid)
+    { :ok, {services_by_name, services_by_uri, store_pid} }
   end
 
   def handle_call({:get_by_name, svc_name}, _from, {services_by_name, services_by_uri, store_pid}) do
-    { :reply, for_name(services_by_name, svc_name), {services_by_name, services_by_uri, store_pid} }
+    svcs = for_name(services_by_name, svc_name)
+    { :reply, svcs, {services_by_name, services_by_uri, store_pid} }
   end
   def handle_call({:get_by_uri, uri}, _from, {services_by_name, services_by_uri, store_pid}) do
-    { :reply, for_uri(uri, services_by_uri), {services_by_name, services_by_uri, store_pid} }
+    svcs = for_uri(uri, services_by_uri)
+    { :reply, svcs, {services_by_name, services_by_uri, store_pid} }
   end
   def handle_call(:dump, _from, {services_by_name, services_by_uri, store_pid}) do
     { :reply, {services_by_name, services_by_uri}, {services_by_name, services_by_uri, store_pid} }
@@ -51,6 +60,16 @@ defmodule Haven.Registry.Server do
     { :noreply, { HashDict.put(services_by_name, service.name, svcs), services_by_uri, store_pid } }
   end
 
+  def terminate(_reason, { services_by_name, services_by_uri, store_pid }) do
+    IO.puts "Haven.Registry.Server#terminate: stuff"
+    result = Haven.Registry.Store.store_registry(store_pid, { services_by_name, services_by_uri })
+    IO.puts "Haven.Registry.Server#terminate: result = #{inspect result}"
+    result
+  end
+
+  ##########################
+  # Registry Implementation
+  ##########################
   def for_name(s, name) do
     HashDict.get(s, name, [])
   end
