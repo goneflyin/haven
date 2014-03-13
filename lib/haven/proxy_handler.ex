@@ -38,4 +38,7 @@ defmodule ProxyHandler do
     conn = body |> list_to_bitstring |> conn.resp_body
     conn
   end
+  def relay_response({:error, {:conn_failed, {:error, :econnrefused}}}, conn) do
+    conn.status(502)
+  end
 end

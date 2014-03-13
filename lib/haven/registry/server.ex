@@ -33,42 +33,38 @@ defmodule Haven.Registry.Server do
   # GenServer Implementation
   ##########################
   def init(store_pid) do
-    { services_by_name, services_by_uri } = Haven.Registry.Store.fetch_registry(store_pid)
-    { :ok, {services_by_name, services_by_uri, store_pid} }
+    { services_by_uri } = Haven.Registry.Store.fetch_registry(store_pid)
+    { :ok, {services_by_uri, store_pid} }
   end
 
-  def handle_call({:get_by_name, svc_name}, _from, {services_by_name, services_by_uri, store_pid}) do
-    svcs = for_name(services_by_name, svc_name)
-    { :reply, svcs, {services_by_name, services_by_uri, store_pid} }
+  def handle_call({:get_by_name, svc_name}, _from, {services_by_uri, store_pid}) do
+    svcs = for_name(svc_name)
+    { :reply, svcs, {services_by_uri, store_pid} }
   end
-  def handle_call({:get_by_uri, uri}, _from, {services_by_name, services_by_uri, store_pid}) do
+  def handle_call({:get_by_uri, uri}, _from, {services_by_uri, store_pid}) do
     svcs = for_uri(uri, services_by_uri)
-    { :reply, svcs, {services_by_name, services_by_uri, store_pid} }
+    { :reply, svcs, {services_by_uri, store_pid} }
   end
-  def handle_call(:dump, _from, {services_by_name, services_by_uri, store_pid}) do
-    { :reply, {services_by_name, services_by_uri}, {services_by_name, services_by_uri, store_pid} }
+  def handle_call(:dump, _from, {services_by_uri, store_pid}) do
+    { :reply, {services_by_uri}, {services_by_uri, store_pid} }
   end
-  def handle_call(unknown, _from, {services_by_name, services_by_uri, store_pid}) do
-    { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_name, services_by_uri, store_pid} }
+  def handle_call(unknown, _from, {services_by_uri, store_pid}) do
+    { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_uri, store_pid} }
   end
 
   def handle_cast(:clear, {_, _, store_pid}) do
     { :noreply, { HashDict.new, HashDict.new, store_pid } }
   end
-  def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_name, services_by_uri, store_pid}) do
-    IO.puts "Haven.Registry.Server#handle_cast(:add, #{inspect service}): services_by_name = #{inspect services_by_name}"
-    { :ok, svc_monitor_pid } = Haven.Monitor.Service.start_link(service)
-    svcs = [ svc_monitor_pid | HashDict.get(services_by_name, svc_name, []) ]
+  def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_uri, store_pid}) do
+    register(service)
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
     services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
-    services_by_name = HashDict.put(services_by_name, service.name, svcs)
-    IO.puts "Haven.Registry.Server#handle_cast: svc_monitor_pid = #{inspect svc_monitor_pid}"
-    { :noreply, { services_by_name, services_by_uri, store_pid } }
+    { :noreply, { services_by_uri, store_pid } }
   end
 
-  def terminate(reason, { services_by_name, services_by_uri, store_pid }) do
+  def terminate(reason, { services_by_uri, store_pid }) do
     IO.puts "Haven.Registry.Server#terminate(): reason = #{inspect reason}"
-    result = Haven.Registry.Store.store_registry(store_pid, { services_by_name, services_by_uri })
+    result = Haven.Registry.Store.store_registry(store_pid, { services_by_uri })
     IO.puts "Haven.Registry.Server#terminate: result = #{inspect result}"
     result
   end
@@ -76,8 +72,25 @@ defmodule Haven.Registry.Server do
   ##########################
   # Registry Implementation
   ##########################
-  def for_name(s, name) do
-    HashDict.get(s, name, [])
+  def register(service = Service[name: svc_name]) do
+    { service_monitors, monitor } = find_or_create_monitor(svc_name)
+    Haven.Monitor.Service.register(monitor, service)
+    service_monitors
+  end
+
+  def find_or_create_monitor(name) do
+    case Haven.Monitor.Supervisor.start_monitor(name) do
+      { :ok, monitor_pid} ->
+        { :ok, monitor_pid }
+      { :error, { :already_started, monitor_pid } } ->
+        { :ok, monitor_pid }
+      { :error, error } ->
+        { :error, error }
+    end
+  end
+
+  def for_name(name) do
+    "TBD"
   end
 
   def for_uri(uri, s) when is_binary(uri) do

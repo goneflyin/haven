@@ -5,18 +5,15 @@ defmodule Haven.Registry.Store do
   # External API
   ##############
   def start_link() do
-    :gen_server.start_link(__MODULE__, { HashDict.new, HashDict.new }, [])
+    :gen_server.start_link({:local, :registry_store}, __MODULE__, { HashDict.new }, [])
   end
 
   def store_registry(pid, registry) do
-    IO.puts "store_registry: pid = #{inspect pid} ; registry = #{inspect registry}"
     :gen_server.cast(pid, {:store, registry})
   end
 
   def fetch_registry(pid) do
-    IO.puts "fetch_registry: pid = #{inspect pid}"
     result = :gen_server.call(pid, :fetch)
-    IO.puts "fetch_registry: result = #{inspect result}"
     result
   end
 
