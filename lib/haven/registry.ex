@@ -8,6 +8,7 @@ defmodule Haven.Registry do
   end
 
   def add_service(svc = Service[]) do
+    IO.puts "casting to :registry with args: { :add, #{inspect svc} }"
     :gen_server.cast(:registry, { :add, svc })
   end
 

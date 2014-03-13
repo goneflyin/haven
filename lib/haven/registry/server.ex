@@ -1,3 +1,5 @@
+require IEx
+
 defmodule Haven.Registry.Server do
   use GenServer.Behaviour
 
@@ -54,14 +56,18 @@ defmodule Haven.Registry.Server do
     { :noreply, { HashDict.new, HashDict.new, store_pid } }
   end
   def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_name, services_by_uri, store_pid}) do
-    svcs = [ service | HashDict.get(services_by_name, svc_name, []) ]
+    IO.puts "Haven.Registry.Server#handle_cast(:add, #{inspect service}): services_by_name = #{inspect services_by_name}"
+    { :ok, svc_monitor_pid } = Haven.Monitor.Service.start_link(service)
+    svcs = [ svc_monitor_pid | HashDict.get(services_by_name, svc_name, []) ]
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
     services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
-    { :noreply, { HashDict.put(services_by_name, service.name, svcs), services_by_uri, store_pid } }
+    services_by_name = HashDict.put(services_by_name, service.name, svcs)
+    IO.puts "Haven.Registry.Server#handle_cast: svc_monitor_pid = #{inspect svc_monitor_pid}"
+    { :noreply, { services_by_name, services_by_uri, store_pid } }
   end
 
-  def terminate(_reason, { services_by_name, services_by_uri, store_pid }) do
-    IO.puts "Haven.Registry.Server#terminate: stuff"
+  def terminate(reason, { services_by_name, services_by_uri, store_pid }) do
+    IO.puts "Haven.Registry.Server#terminate(): reason = #{inspect reason}"
     result = Haven.Registry.Store.store_registry(store_pid, { services_by_name, services_by_uri })
     IO.puts "Haven.Registry.Server#terminate: result = #{inspect result}"
     result
