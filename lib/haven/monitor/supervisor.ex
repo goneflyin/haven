@@ -10,8 +10,19 @@ defmodule Haven.Monitor.Supervisor do
   end
 
   def start_monitor(name) do
-    monitor_spec = worker(Haven.Monitor.Service, [name], [id: name])
-    IO.puts "supervising a new service monitor -- monitor_spec: #{inspect monitor_spec}"
-    :supervisor.start_child(:mon_sup, monitor_spec)
+    :supervisor.start_child(:mon_sup, worker(Haven.Monitor.Service, [name], [id: name]))
+  end
+
+  def pid_for_name(name) do
+    pid_for_name(name, :supervisor.which_children(:mon_sup))
+  end
+  def pid_for_name(name, []) do
+    { :none, "No service found for name '#{name}'" }
+  end
+  def pid_for_name(name, [{name, pid, _, _} | monitors]) do
+    { :ok, pid }
+  end
+  def pid_for_name(name, [monitor | monitors]) do
+    pid_for_name(name, monitors)
   end
 end

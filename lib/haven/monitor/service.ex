@@ -15,9 +15,9 @@ defmodule Haven.Monitor.Service do
     :gen_server.call(pid, {:register, service})
   end
 
-  # def add_instance(pid, instance) do # {host, port, uris}
-  #   :gen_server.call(pid, {:add_instance, instance})
-  # end
+  def get_info(pid) do # {host, port, uris}
+    :gen_server.call(pid, :get_info)
+  end
 
   def get_name(pid) do
     :gen_server.call(pid, :get_name)
@@ -29,10 +29,9 @@ defmodule Haven.Monitor.Service do
     { :ok, State.new(name: name) }
   end
 
-  # def handle_call({:add_instance, instance}, _from, state) do
-  #   IO.puts "need to do something to add instance [#{inspect instance}] to service #{state}"
-  #   { :reply, :ok, state }
-  # end
+  def handle_call(:get_info, _from, state) do
+    { :reply, { :ok, state }, state }
+  end
 
   def handle_call(:get_name, _from, state) do
     { :reply, { :ok, Keyword.get(state, :name) }, state }
@@ -51,7 +50,7 @@ defmodule Haven.Monitor.Service do
 
     # TODO: Create Instance Monitor for instances
 
-    IO.puts "Calling -- Service.Monitor#register_uris(new hashset for #{inspect state.uris}, #{inspect instance.uris})"
+    IO.puts "Calling -- Service.Monitor#register_uris(#{inspect state.uris}, #{inspect instance.uris})"
     { :ok, service_uris } = register_uris(state.uris, HashSet.new(instance.uris))
     { :reply, { :ok }, state }
   end

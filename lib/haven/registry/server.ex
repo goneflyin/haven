@@ -73,9 +73,9 @@ defmodule Haven.Registry.Server do
   # Registry Implementation
   ##########################
   def register(service = Service[name: svc_name]) do
-    { service_monitors, monitor } = find_or_create_monitor(svc_name)
-    Haven.Monitor.Service.register(monitor, service)
-    service_monitors
+    { :ok, monitor_pid } = find_or_create_monitor(svc_name)
+    Haven.Monitor.Service.register(monitor_pid, service)
+    :ok
   end
 
   def find_or_create_monitor(name) do
@@ -90,7 +90,7 @@ defmodule Haven.Registry.Server do
   end
 
   def for_name(name) do
-    "TBD"
+    Haven.Monitor.Supervisor.pid_for_name(name)
   end
 
   def for_uri(uri, s) when is_binary(uri) do
