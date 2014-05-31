@@ -21,4 +21,8 @@ defmodule Haven.Dynamo do
   #   session_options:
   #     [ key: "_haven_session",
   #       secret: "EEufPhPvIaAnuk3ryQ4i27JQpEgmipMNLIY/fnRul7Z7XLwSyQc3SY8/LhfZyFR7"]
+
+  templates do
+    use Dynamo.Helpers
+  end
 end
