@@ -1,5 +1,5 @@
 defmodule Haven.Supervisor do
-  use Supervisor.Behaviour
+  use Supervisor
 
   def start_link(_) do
     result = {:ok, sup} = :supervisor.start_link({:local, :haven_sup}, __MODULE__, [])

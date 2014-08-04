@@ -1,5 +1,5 @@
 defmodule Haven do
-  use Application.Behaviour
+  use Application
 
   @doc """
   The application callback used to start this

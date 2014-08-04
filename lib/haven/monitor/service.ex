@@ -1,9 +1,11 @@
 defmodule Haven.Monitor.Service do
-  use GenServer.Behaviour
+  use GenServer
 
   alias Haven.Registry.Service
 
-  defrecord State, name: nil, uris: []
+  defmodule State do
+    defstruct name: nil, uris: []
+  end
 
   ######################
   # External API
@@ -37,7 +39,7 @@ defmodule Haven.Monitor.Service do
     { :reply, { :ok, Keyword.get(state, :name) }, state }
   end
 
-  def handle_call({:register, instance = Service[name: name]}, _from, state = State[name: name]) do
+  def handle_call({:register, instance = %Service{name: name}}, _from, state = %State{name: name}) do
     IO.puts "Service.Monitor#handle_call :register -- instance: #{inspect instance}, state: #{inspect state}"
     # TODO: Fail Fast if new registration data conflicts sufficiently with existing service data
     #    - name: can't conflict, it is the key used to identify and find this service

@@ -1,5 +1,5 @@
 defmodule Haven.Registry.Supervisor do
-  use Supervisor.Behaviour
+  use Supervisor
 
   # A convenience to start the supervisor
   # Should not be needed since this supervisor should be started by HavenSupervisor

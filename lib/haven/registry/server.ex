@@ -1,7 +1,7 @@
 require IEx
 
 defmodule Haven.Registry.Server do
-  use GenServer.Behaviour
+  use GenServer
 
   @moduledoc """
   Holds the set of Services and Service Instances that are registered with Haven
@@ -55,7 +55,7 @@ defmodule Haven.Registry.Server do
   def handle_cast(:clear, {_, _, store_pid}) do
     { :noreply, { HashDict.new, HashDict.new, store_pid } }
   end
-  def handle_cast({ :add, service = Service[name: svc_name, uris: svc_uris] }, {services_by_uri, store_pid}) do
+  def handle_cast({ :add, service = %Service{name: svc_name, uris: svc_uris} }, {services_by_uri, store_pid}) do
     register(service)
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
     services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
@@ -72,7 +72,7 @@ defmodule Haven.Registry.Server do
   ##########################
   # Registry Implementation
   ##########################
-  def register(service = Service[name: svc_name]) do
+  def register(service = %Service{name: svc_name}) do
     { :ok, monitor_pid } = find_or_create_monitor(svc_name)
     Haven.Monitor.Service.register(monitor_pid, service)
     :ok

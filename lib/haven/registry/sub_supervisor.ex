@@ -1,5 +1,5 @@
 defmodule Haven.Registry.SubSupervisor do
-  use Supervisor.Behaviour
+  use Supervisor
 
   def start_link(registry_store) do
     :supervisor.start_link({:global, :registry_sub_sup}, __MODULE__, registry_store)

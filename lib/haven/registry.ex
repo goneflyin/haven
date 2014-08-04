@@ -1,13 +1,16 @@
 defmodule Haven.Registry do
 
-  defrecord Service, name: nil, uris: [], host: "127.0.0.1", port: 8888
+  defmodule Service do
+    defstruct name: nil, uris: [], host: "127.0.0.1", port: 8888
+  end
+  # defrecord Service, name: nil, uris: [], host: "127.0.0.1", port: 8888
   # defrecord Instance, name: nil, uris: [], host: "127.0.0.1", port: 8888
 
   def clear do
     :gen_server.cast(:registry, :clear)
   end
 
-  def add_service(svc = Service[]) do
+  def add_service(svc = %Service{}) do
     IO.puts "casting to :registry with args: { :add, #{inspect svc} }"
     :gen_server.cast(:registry, { :add, svc })
   end
@@ -35,7 +38,7 @@ defmodule Haven.Registry do
     [to_hash(service) | to_hash(rest)]
   end
   def to_hash([]), do: []
-  def to_hash(service = Service[]) do
+  def to_hash(service = %Service{}) do
     HashDict.new
       |> HashDict.put(:name, service.name)
       |> HashDict.put(:uris, service.uris)

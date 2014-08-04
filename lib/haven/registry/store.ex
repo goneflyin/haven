@@ -1,5 +1,5 @@
 defmodule Haven.Registry.Store do
-  use GenServer.Behaviour
+  use GenServer
 
   ##############
   # External API
