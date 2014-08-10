@@ -1,14 +1,14 @@
 defmodule RegistrarRouter do
-  use Dynamo.Router
+  use Plug.Router
 
   alias Haven.Registry, as: Registry
-  prepare do
-    conn
-    |> fetch([:params, :body, :headers])
-    |> require_content_type_json
-    |> add_content_type_json
 
-  end
+  # prepare do
+  #   conn
+  #   |> fetch([:params, :body, :headers])
+  #   |> require_content_type_json
+  #   |> add_content_type_json
+  # end
 
   post "/" do
     add_service(JSON.decode(conn.req_body))

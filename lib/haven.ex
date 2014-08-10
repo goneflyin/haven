@@ -1,15 +1,15 @@
 defmodule Haven do
+
   use Application
 
   @doc """
-  The application callback used to start this
-  application and its Dynamos.
+  The entry point to Haven. Starts a supervisor and triggers all dependent processes.
   """
   def start(_type, args) do
     start_registry(args[:registry])
   end
 
-  def start_registry(registry_args) do
+  def start_registry(_) do
     Haven.Supervisor.start_link([])
   end
 

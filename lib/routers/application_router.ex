@@ -1,17 +1,16 @@
 # require IEx
 
 defmodule ApplicationRouter do
-  use Dynamo.Router
+  import Plug.Conn
+  use Plug.Router
 
   @header "X-Haven-REST-Proxy"
 
-  prepare do
-    conn.put_resp_header(@header, "true")
-  end
-
   forward "/services", to: RegistrarRouter
 
-  match "/*" do
+  match _ do
+    # TODO: Need to put this header somewhere it is guaranteed to always be added
+    conn.put_resp_header(@header, "true")
     ProxyHandler.handle(conn)
   end
 end
