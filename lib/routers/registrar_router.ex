@@ -1,5 +1,6 @@
 defmodule RegistrarRouter do
   use Plug.Router
+  import Plug.Conn
 
   alias Haven.Registry, as: Registry
 
@@ -10,9 +11,19 @@ defmodule RegistrarRouter do
   #   |> add_content_type_json
   # end
 
+  plug :match
+  plug :dispatch
+
+  get "/" do
+    send_resp(conn, 200, JSON.encode!(Haven.Registry.dump()))
+  end
+
   post "/" do
-    add_service(JSON.decode(conn.req_body))
-    conn.resp 200, JSON.encode!(Haven.Registry.dump())
+    {:ok, body, conn} = Plug.Conn.read_body(conn, length: 1_000_000)
+    service_spec = JSON.decode(body)
+    IO.puts "service_spec:   #{inspect service_spec}"
+    add_service(service_spec)
+    send_resp(conn, 200, JSON.encode!(Haven.Registry.dump()))
   end
 
   get "/:name" do

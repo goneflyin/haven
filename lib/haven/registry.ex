@@ -28,10 +28,11 @@ defmodule Haven.Registry do
   end
 
   def from_hash(svc_hash) do
-    Service.new(name: HashDict.get(svc_hash, "name"),
-                uris: HashDict.get(svc_hash, "uris"),
-                host: HashDict.get(svc_hash, "host"),
-                port: HashDict.get(svc_hash, "port"))
+    IO.puts("Registry.from_hash: #{inspect svc_hash}")
+    %Service{name: svc_hash["service"],
+                uris: svc_hash["uris"],
+                host: svc_hash["host"],
+                port: svc_hash["port"]}
   end
 
   def to_hash([service | rest]) do
@@ -40,7 +41,7 @@ defmodule Haven.Registry do
   def to_hash([]), do: []
   def to_hash(service = %Service{}) do
     HashDict.new
-      |> HashDict.put(:name, service.name)
+      |> HashDict.put(:service, service.name)
       |> HashDict.put(:uris, service.uris)
       |> HashDict.put(:host, service.host)
       |> HashDict.put(:port, service.port)

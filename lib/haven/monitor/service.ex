@@ -28,7 +28,7 @@ defmodule Haven.Monitor.Service do
   ##########################
   # GenServer Implementation
   def init(name) do
-    { :ok, State.new(name: name) }
+    { :ok, %State{name: name} }
   end
 
   def handle_call(:get_info, _from, state) do

@@ -4,7 +4,7 @@ defmodule Haven.Registry.Supervisor do
   # A convenience to start the supervisor
   # Should not be needed since this supervisor should be started by HavenSupervisor
   def start_link() do
-    result = { :ok, sup } = Supervisor.start_link(__MODULE__, [], name: :registry_sup)
+    result = { :ok, sup } = Supervisor.start_link( __MODULE__, [], name: :registry_sup)
     start_workers(sup)
     IO.puts "Haven.Registry.Supervisor#start_link:    registry_sup     = #{inspect sup}"
     result

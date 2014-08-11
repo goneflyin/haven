@@ -6,12 +6,20 @@ defmodule ApplicationRouter do
 
   @header "X-Haven-REST-Proxy"
 
+  plug :match
+  plug :dispatch
+
   forward "/services", to: RegistrarRouter
+
+  get "/foo" do
+    send_resp(conn, 200, "Hello Bar")
+  end
 
   match _ do
     # TODO: Need to put this header somewhere it is guaranteed to always be added
-    conn.put_resp_header(@header, "true")
-    ProxyHandler.handle(conn)
+    conn
+      |> put_resp_header(@header, "true")
+      |> ProxyHandler.handle
   end
 end
 
