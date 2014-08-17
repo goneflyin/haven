@@ -1,3 +1,5 @@
+require Logger
+
 defmodule Haven.Registry.Supervisor do
   use Supervisor
 
@@ -7,7 +9,7 @@ defmodule Haven.Registry.Supervisor do
     result = { :ok, sup } = Supervisor.start_link( __MODULE__, [], name: :registry_sup)
     start_workers(sup)
     # TODO: Convert these puts statements to logger statements
-    IO.puts "Haven.Registry.Supervisor#start_link:    registry_sup     = #{inspect sup}"
+    Logger.info "Haven.Registry.Supervisor#start_link:    registry_sup     = #{inspect sup}"
     result
   end
 
@@ -17,9 +19,9 @@ defmodule Haven.Registry.Supervisor do
     { :ok, registry_sub_sup } = Supervisor.start_child(sup, supervisor(Haven.Registry.SubSupervisor, [registry_store]))
     { :ok, mon_sup } = Supervisor.start_child(sup, supervisor(Haven.Monitor.Supervisor, []))
     # TODO: Convert these puts statements to logger statements
-    IO.puts "Haven.Registry.Supervisor#start_workers: registry_store   = #{inspect registry_store}"
-    IO.puts "Haven.Registry.Supervisor#start_workers: registry_sub_sup = #{inspect registry_sub_sup}"
-    IO.puts "Haven.Registry.Supervisor#start_workers: mon_sup          = #{inspect mon_sup}"
+    Logger.info "Haven.Registry.Supervisor#start_workers: registry_store   = #{inspect registry_store}"
+    Logger.info "Haven.Registry.Supervisor#start_workers: registry_sub_sup = #{inspect registry_sub_sup}"
+    Logger.info "Haven.Registry.Supervisor#start_workers: mon_sup          = #{inspect mon_sup}"
   end
 
   def init(_) do
