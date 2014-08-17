@@ -22,7 +22,7 @@ defmodule RegistrarRouter do
   post "/" do
     {:ok, body, conn} = Plug.Conn.read_body(conn, length: 1_000_000)
     service_spec = JSON.decode!(body)
-    IO.puts "service_spec:   #{inspect service_spec}"
+    # IO.puts "service_spec:   #{inspect service_spec}"
     add_service(service_spec)
     send_resp(conn, 200, JSON.encode!(Haven.Registry.dump()))
   end

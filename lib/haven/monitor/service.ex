@@ -40,7 +40,7 @@ defmodule Haven.Monitor.Service do
   end
 
   def handle_call({:register, instance = %Service{name: name}}, _from, state = %State{name: name}) do
-    IO.puts "Service.Monitor#handle_call :register -- instance: #{inspect instance}, state: #{inspect state}"
+    # IO.puts "Service.Monitor#handle_call :register -- instance: #{inspect instance}, state: #{inspect state}"
     # TODO: Fail Fast if new registration data conflicts sufficiently with existing service data
     #    - name: can't conflict, it is the key used to identify and find this service
     #       --> THEREFORE fail if names don't match -- this registration should never get here if it's not
@@ -52,7 +52,7 @@ defmodule Haven.Monitor.Service do
 
     # TODO: Create Instance Monitor for instances
 
-    IO.puts "Calling -- Service.Monitor#register_uris(#{inspect state.uris}, #{inspect instance.uris})"
+    # IO.puts "Calling -- Service.Monitor#register_uris(#{inspect state.uris}, #{inspect instance.uris})"
     { _, uris } = Enum.map_reduce(instance.uris, HashSet.new, fn(uri, set) -> { uri, HashSet.put(set, uri) } end)
     { :ok, service_uris } = register_uris(state.uris, uris)
     { :reply, { :ok }, state }

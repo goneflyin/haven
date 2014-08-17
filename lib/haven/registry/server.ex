@@ -63,9 +63,9 @@ defmodule Haven.Registry.Server do
   end
 
   def terminate(reason, { services_by_uri, store_pid }) do
-    IO.puts "Haven.Registry.Server#terminate(): reason = #{inspect reason}"
+    #  "Haven.Registry.Server#terminate(): reason = #{inspect reason}"
     result = Haven.Registry.Store.store_registry(store_pid, { services_by_uri })
-    IO.puts "Haven.Registry.Server#terminate: result = #{inspect result}"
+    # IO.puts "Haven.Registry.Server#terminate: result = #{inspect result}"
     result
   end
 
