@@ -1,12 +1,17 @@
 defmodule ProxyHandler do
 
+  require Logger
+
   alias Haven.Registry
   alias Haven.Registry.Service
   alias Plug.Conn
 
+  @filter_headers ["Content-Length"]
+
   def handle(conn) do
     Conn.delete_resp_header(conn, "cache-control")
     Conn.delete_resp_header(conn, "connection")
+    Conn.delete_resp_header(conn, "content-length")
 
     Registry.get_services_by_uri(conn.path_info)
       |> _handle(conn)
@@ -41,22 +46,13 @@ defmodule ProxyHandler do
   end
 
   def relay_response({:ok, status, headers, body}, conn) do
-    # IO.puts "relay_response: status  = #{inspect status} [binary: #{is_binary(status)}]"
-    # IO.puts "relay_response: headers = #{inspect headers} [binary: #{is_binary(headers)}]"
-    # IO.puts "relay_response: body    = #{inspect body}"
-    # IO.puts" relay_response: conn.state = #{inspect conn.state}"
-
-    Enum.reduce headers, conn, fn({header_key, value}, conn) ->
-                                 # IO.puts "relay_response--reduction: header_key = #{inspect header_key} [binary: #{is_binary(header_key)}]"
-                                 # IO.puts "relay_response--reduction: value      = #{inspect value} [binary: #{is_binary(value)}]"
-                                 # IO.puts "relay_response--reduction: conn       = #{inspect conn}"
-                                 Conn.put_resp_header(conn, as_binary(header_key), as_binary(value))
-    end
-
-    conn = Conn.send_resp(conn, as_integer(status), body)
+    Enum.filter(headers, &filter_header?/1)
+      |> Enum.reduce(conn, &add_header_to_conn/2)
+      |> Conn.send_resp(as_integer(status), body)
   end
   def relay_response({:error, {:conn_failed, {:error, :econnrefused}}}, conn) do
-    Conn.send_resp(conn, 502, "")
+    Logger.debug "Error response from calling service. Conn: #{inspect conn}"
+    Conn.send_resp(conn, 502, "") # TODO: DO we need a better error message here?
   end
 
   def as_integer(i) when is_list(i), do: List.to_integer(i)
@@ -64,4 +60,13 @@ defmodule ProxyHandler do
 
   def as_binary(s) when is_list(s), do: List.to_string(s)
   def as_binary(s), do: s
+
+  def filter_header?({header, _}) do
+    Enum.find_index(@filter_headers, fn (skip_header) -> as_binary(header) == skip_header end) == nil
+  end
+
+  def add_header_to_conn({header_key, value}, conn) do
+    Logger.warn "adding_header: {#{inspect header_key}, #{inspect value}}"
+    Conn.put_resp_header(conn, as_binary(header_key), as_binary(value))
+  end
 end
