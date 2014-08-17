@@ -56,7 +56,7 @@ defmodule ProxyHandler do
     conn = Conn.send_resp(conn, as_integer(status), body)
   end
   def relay_response({:error, {:conn_failed, {:error, :econnrefused}}}, conn) do
-    conn.status(502)
+    Conn.send_resp(conn, 502, "")
   end
 
   def as_integer(i) when is_list(i), do: List.to_integer(i)
