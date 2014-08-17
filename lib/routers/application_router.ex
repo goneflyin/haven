@@ -11,10 +11,6 @@ defmodule ApplicationRouter do
 
   forward "/services", to: RegistrarRouter
 
-  get "/foo" do
-    send_resp(conn, 200, "Hello Bar")
-  end
-
   match _ do
     # TODO: Need to put this header somewhere it is guaranteed to always be added
     conn

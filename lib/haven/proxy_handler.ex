@@ -9,37 +9,27 @@ defmodule ProxyHandler do
   @filter_headers ["Content-Length"]
 
   def handle(conn) do
-    Conn.delete_resp_header(conn, "cache-control")
-    Conn.delete_resp_header(conn, "connection")
-    Conn.delete_resp_header(conn, "content-length")
-
-    Registry.get_services_by_uri(conn.path_info)
-      |> _handle(conn)
+    Registry.get_services_by_uri(conn.path_info) |> _handle(conn)
   end
 
-  def _handle([], conn) do
-    Conn.send_resp(conn, 418, "Nothing to see here, move along, try some other URL whydontcha")
-  end
   def _handle([%Service{host: host, port: port} | _], conn) do
     conn = conn |> Conn.fetch_cookies |> Conn.fetch_params
-    # scheme = conn.scheme
     url = '#{conn.scheme}://#{host}:#{port}/#{conn.path_info}?#{conn.query_string}'
     headers = convert_keys_to_atoms conn.req_headers
-    # cookies = conn.req_cookies
+
     # TODO: handle additional possible return conditions from read_body
     {:ok, body, conn} = Conn.read_body(conn)
     method = conn.method |> String.downcase |> String.to_atom
-    # IO.inspect url
-    # IO.inspect headers
-    # IO.inspect method
-    # IO.inspect body
 
     :ibrowse.send_req(url, headers, method, body) |> relay_response(conn)
   end
+  def _handle(_, conn) do
+    Conn.send_resp(conn, 418, "No service registered for URI: #{conn.path_info}")
+  end
 
   def convert_keys_to_atoms([]), do: []
-  def convert_keys_to_atoms([{dynamo_header_key, dynamo_header_value} | rest]) do
-    [{String.to_atom(dynamo_header_key), dynamo_header_value} | convert_keys_to_atoms(rest)]
+  def convert_keys_to_atoms([{header_key, header_value} | rest]) do
+    [{String.to_atom(header_key), header_value} | convert_keys_to_atoms(rest)]
   end
   def convert_keys_to_atoms(dict) do
     convert_keys_to_atoms(Binary.Dict.to_list(dict))
@@ -62,11 +52,12 @@ defmodule ProxyHandler do
   def as_binary(s), do: s
 
   def filter_header?({header, _}) do
-    Enum.find_index(@filter_headers, fn (skip_header) -> as_binary(header) == skip_header end) == nil
+    Enum.find_index(@filter_headers,
+                    fn (skip_header) -> as_binary(header) == skip_header end) == nil
   end
 
   def add_header_to_conn({header_key, value}, conn) do
-    Logger.warn "adding_header: {#{inspect header_key}, #{inspect value}}"
+    Logger.debug "adding_header: {#{inspect header_key}, #{inspect value}}"
     Conn.put_resp_header(conn, as_binary(header_key), as_binary(value))
   end
 end
