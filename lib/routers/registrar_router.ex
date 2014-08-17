@@ -1,4 +1,5 @@
 defmodule RegistrarRouter do
+  use Jazz
   use Plug.Router
   import Plug.Conn
 
@@ -20,7 +21,7 @@ defmodule RegistrarRouter do
 
   post "/" do
     {:ok, body, conn} = Plug.Conn.read_body(conn, length: 1_000_000)
-    service_spec = JSON.decode(body)
+    service_spec = JSON.decode!(body)
     IO.puts "service_spec:   #{inspect service_spec}"
     add_service(service_spec)
     send_resp(conn, 200, JSON.encode!(Haven.Registry.dump()))
@@ -31,17 +32,17 @@ defmodule RegistrarRouter do
     conn.resp 200, json
   end
 
-  defp add_service({:ok, service}) do
+  defp add_service(service) do
     Registry.from_hash(service)
       |> Registry.add_service
   end
-  defp add_service({error, data}) do
-    IO.puts "got an error [#{error}] decoding service json!"
-    IO.puts "got some data with the error: #{data}"
-  end
+  # defp add_service({error, data}) do
+  #   IO.puts "got an error [#{error}] decoding service json!"
+  #   IO.puts "got some data with the error: #{data}"
+  # end
 
   def create_response(body) do
-    JSON.decode(body)
+    JSON.decode!(body)
       |> handle_decode
       |> JSON.encode!
   end

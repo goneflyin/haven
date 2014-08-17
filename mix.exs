@@ -12,17 +12,18 @@ defmodule Haven.Mixfile do
   # Configuration for the OTP application
   def application do
     [ registered: [:registry],
-      applications: [:cowboy, :plug],
+      applications: [:cowboy, :plug, :ibrowse],
       mod: { Haven, [] } ]
   end
 
   defp deps do
-    [ { :cowboy,    "~> 1.0.0" },
-      { :plug,      "~> 0.5.3" },
-      { :json,      "~> 0.3.0" },
-      { :httpotion, "~> 0.2.3" },
-      { :ex_doc,    "~> 0.5.1" },
-      { :apex,      "~> 0.3.0" }
+    [ { :cowboy,     "~> 1.0.0" },
+      { :plug,       "~> 0.5.3" },
+      { :jazz,       "~> 0.2.0" },
+      { :ibrowse, tag: "v4.1.1", github: "cmullaparthi/ibrowse" },
+      { :httpotion,  "~> 0.2.3" },
+      { :ex_doc,     "~> 0.5.1" },
+      { :apex,       "~> 0.3.0" }
     ]
   end
 end

@@ -46,7 +46,7 @@ defmodule Haven.Registry.Server do
     { :reply, svcs, {services_by_uri, store_pid} }
   end
   def handle_call(:dump, _from, {services_by_uri, store_pid}) do
-    { :reply, {services_by_uri}, {services_by_uri, store_pid} }
+    { :reply, services_by_uri, {services_by_uri, store_pid} }
   end
   def handle_call(unknown, _from, {services_by_uri, store_pid}) do
     { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_uri, store_pid} }
