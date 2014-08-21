@@ -32,39 +32,39 @@ defmodule Haven.Registry.Server do
   ##########################
   # GenServer Implementation
   ##########################
-  def init(store_pid) do
-    { services_by_uri } = Haven.Registry.Store.fetch_registry(store_pid)
-    { :ok, {services_by_uri, store_pid} }
+  def init(_) do
+    services_by_uri = Haven.Registry.Store.fetch_registry()
+    { :ok, services_by_uri }
   end
 
-  def handle_call({:get_by_name, svc_name}, _from, {services_by_uri, store_pid}) do
+  def handle_call({:get_by_name, svc_name}, _from, {services_by_uri}) do
     svcs = for_name(svc_name)
-    { :reply, svcs, {services_by_uri, store_pid} }
+    { :reply, svcs, {services_by_uri} }
   end
-  def handle_call({:get_by_uri, uri}, _from, {services_by_uri, store_pid}) do
+  def handle_call({:get_by_uri, uri}, _from, {services_by_uri}) do
     svcs = for_uri(uri, services_by_uri)
-    { :reply, svcs, {services_by_uri, store_pid} }
+    { :reply, svcs, {services_by_uri} }
   end
-  def handle_call(:dump, _from, {services_by_uri, store_pid}) do
-    { :reply, services_by_uri, {services_by_uri, store_pid} }
+  def handle_call(:dump, _from, {services_by_uri}) do
+    { :reply, services_by_uri, {services_by_uri} }
   end
-  def handle_call(unknown, _from, {services_by_uri, store_pid}) do
-    { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_uri, store_pid} }
+  def handle_call(unknown, _from, {services_by_uri}) do
+    { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_uri} }
   end
 
-  def handle_cast(:clear, {_, _, store_pid}) do
-    { :noreply, { HashDict.new, HashDict.new, store_pid } }
+  def handle_cast(:clear, {_, _}) do
+    { :noreply, { HashDict.new, HashDict.new } }
   end
-  def handle_cast({ :add, service = %Service{name: svc_name, uris: svc_uris} }, {services_by_uri, store_pid}) do
+  def handle_cast({ :add, service = %Service{name: svc_name, uris: svc_uris} }, {services_by_uri}) do
     register(service)
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
     services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
-    { :noreply, { services_by_uri, store_pid } }
+    { :noreply, { services_by_uri } }
   end
 
-  def terminate(reason, { services_by_uri, store_pid }) do
+  def terminate(reason, { services_by_uri }) do
     #  "Haven.Registry.Server#terminate(): reason = #{inspect reason}"
-    result = Haven.Registry.Store.store_registry(store_pid, { services_by_uri })
+    result = Haven.Registry.Store.store_registry(services_by_uri)
     # IO.puts "Haven.Registry.Server#terminate: result = #{inspect result}"
     result
   end
