@@ -13,6 +13,7 @@ defmodule ProxyHandler do
   end
 
   def _handle([%Service{host: host, port: port} | _], conn) do
+    # TODO: handle multiple services (load balancing)
     conn = conn |> Conn.fetch_cookies |> Conn.fetch_params
     url = '#{conn.scheme}://#{host}:#{port}/#{conn.path_info}?#{conn.query_string}'
     headers = convert_keys_to_atoms conn.req_headers
@@ -41,7 +42,7 @@ defmodule ProxyHandler do
       |> Conn.send_resp(as_integer(status), body)
   end
   def relay_response({:error, {:conn_failed, {:error, :econnrefused}}}, conn) do
-    Logger.debug "Error response from calling service. Conn: #{inspect conn}"
+    Logger.info "Service Unavailable: #{conn.host}:#{conn.port}/#{conn.path_info}"
     Conn.send_resp(conn, 502, "") # TODO: DO we need a better error message here?
   end
 
