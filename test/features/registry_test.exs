@@ -12,9 +12,9 @@ defmodule RegistryTest do
   #   assert(Registry.get_services_by_name("coll_svc") == [])
   # end
 
-  # test "getting service by uri when empty should return empty list" do
-  #   assert(Registry.get_services_by_name("/coll") == [])
-  # end
+  test "getting service by uri when empty should return empty list" do
+    assert(Registry.get_services_by_uri("/coll") == [])
+  end
 
   # test "service is returned once added" do
   #   coll_svc = Service.new(name: "coll_svc", port: 1234, host: "1.4.9.16", uris: ["/collections", "/other"])
