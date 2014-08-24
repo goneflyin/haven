@@ -34,7 +34,7 @@ defmodule Haven.Registry.Server do
   ##########################
   def init(_) do
     services_by_uri = Haven.Registry.Store.fetch_registry()
-    { :ok, services_by_uri }
+    { :ok, {services_by_uri} }
   end
 
   def handle_call({:get_by_name, svc_name}, _from, {services_by_uri}) do
@@ -52,14 +52,14 @@ defmodule Haven.Registry.Server do
     { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_uri} }
   end
 
-  def handle_cast(:clear, {_, _}) do
-    { :noreply, { HashDict.new, HashDict.new } }
+  def handle_cast(:clear, _) do
+    { :noreply, {HashDict.new} }
   end
   def handle_cast({ :add, service = %Service{name: svc_name, uris: svc_uris} }, {services_by_uri}) do
     register(service)
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
     services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
-    { :noreply, { services_by_uri } }
+    { :noreply, {services_by_uri}}
   end
 
   def terminate(reason, { services_by_uri }) do

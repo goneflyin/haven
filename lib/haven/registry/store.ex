@@ -15,13 +15,13 @@ defmodule Haven.Registry.Store do
     # old way
     # :gen_server.cast(pid, {:store, registry})
     # new way
-    Agent.update(__MODULE__, fn -> registry end)
+    Agent.update(__MODULE__, fn(_) -> registry end)
   end
 
   def fetch_registry() do
     # old way
     # :gen_server.call(pid, :fetch)
     # new way
-    { Agent.get(__MODULE__, &(&1)) }
+    Agent.get(__MODULE__, &(&1))
   end
 end
