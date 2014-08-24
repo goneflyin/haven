@@ -1,5 +1,5 @@
 defmodule RegistryTest do
-  use Haven.TestCase
+  use ExUnit.Case, async: false
 
   alias Haven.Registry
   alias Haven.Registry.Service
