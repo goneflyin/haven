@@ -34,32 +34,32 @@ defmodule Haven.Registry.Server do
   ##########################
   def init(_) do
     services_by_uri = Haven.Registry.Store.fetch_registry()
-    { :ok, {services_by_uri} }
+    { :ok, %{by_uri: services_by_uri} }
   end
 
-  def handle_call({:get_by_name, svc_name}, _from, {services_by_uri}) do
+  def handle_call({:get_by_name, svc_name}, _from, state) do
     svcs = for_name(svc_name)
-    { :reply, svcs, {services_by_uri} }
+    { :reply, svcs, state }
   end
-  def handle_call({:get_by_uri, uri}, _from, {services_by_uri}) do
-    svcs = for_uri(uri, services_by_uri)
-    { :reply, svcs, {services_by_uri} }
+  def handle_call({:get_by_uri, uri}, _from, state) do
+    svcs = for_uri(uri, state.by_uri)
+    { :reply, svcs, state }
   end
-  def handle_call(:dump, _from, {services_by_uri}) do
-    { :reply, services_by_uri, {services_by_uri} }
+  def handle_call(:dump, _from, state) do
+    { :reply, state.by_uri, state }
   end
-  def handle_call(unknown, _from, {services_by_uri}) do
-    { :reply, {:error, "Unable to handle_call for unknown"}, {services_by_uri} }
+  def handle_call(unknown, _from, state) do
+    { :reply, {:error, "Unable to handle_call for #{unknown}"}, state }
   end
 
   def handle_cast(:clear, _) do
-    { :noreply, {HashDict.new} }
+    { :noreply, %{by_uri: HashDict.new} }
   end
-  def handle_cast({ :add, service = %Service{name: svc_name, uris: svc_uris} }, {services_by_uri}) do
+  def handle_cast({ :add, service = %Service{name: svc_name, uris: svc_uris} }, state) do
     register(service)
     add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
-    services_by_uri = Enum.reduce(svc_uris, services_by_uri, add_svc)
-    { :noreply, {services_by_uri}}
+    services_by_uri = Enum.reduce(svc_uris, state.by_uri, add_svc)
+    { :noreply, %{state|by_uri: services_by_uri}}
   end
 
   def terminate(reason, { services_by_uri }) do
