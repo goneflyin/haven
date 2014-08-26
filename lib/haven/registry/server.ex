@@ -122,11 +122,11 @@ defmodule Haven.Registry.Server do
     _for_uri(rest, node_for_root, answer)
   end
 
+
   def add_for_uri(uri, handler, s) do
     String.split(uri, "/", trim: true)
       |> _add_for_uri(handler, s)
   end
-
 
   def _add_for_uri([], handler, s) do
     # IO.puts("_add_for_uri(A): uri: [], s: #{storage_to_chars(s)}")
