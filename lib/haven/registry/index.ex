@@ -18,39 +18,9 @@ defmodule Haven.Registry.Index do
   end
 
   def add_service(index, service = %Service{uris: svc_uris}) do
-    add_svc = fn(uri, s) -> add_for_uri(uri, service, s) end
-    Enum.reduce(svc_uris, index, add_svc)
+    svc_uris
+    |> Enum.reduce(index, fn(uri, index) -> add_for_uri(uri, service, index) end)
   end
-
-  defp for_uri(uri, s) when is_binary(uri) do
-    _for_uri(String.split(uri, "/", trim: true), s, [])
-  end
-  defp for_uri(uri, s) when is_list(uri) do
-    _for_uri(uri, s, [])
-  end
-
-  defp _for_uri([], s, answer) do
-    HashDict.get(s, "", answer)
-  end
-  defp _for_uri("", s, answer) do
-    _for_uri([], s, answer)
-  end
-  defp _for_uri(["" | rest], s, answer) do
-    answer = case HashDict.get(s, "") do
-               [] -> answer
-               instances -> instances
-             end
-    _for_uri(rest, s, answer)
-  end
-  defp _for_uri([root | []], s, answer) do
-    node_for_root = HashDict.get(s, root, HashDict.new)
-    _for_uri("", node_for_root, answer)
-  end
-  defp _for_uri([root | rest], s, answer) do
-    node_for_root = HashDict.get(s, root, HashDict.new)
-    _for_uri(rest, node_for_root, answer)
-  end
-
 
   def add_for_uri(uri, handler, s) do
     String.split(uri, "/", trim: true)
@@ -86,5 +56,35 @@ defmodule Haven.Registry.Index do
       node ->
         node
     end
+  end
+
+
+  defp for_uri(uri, s) when is_binary(uri) do
+    _for_uri(String.split(uri, "/", trim: true), s, [])
+  end
+  defp for_uri(uri, s) when is_list(uri) do
+    _for_uri(uri, s, [])
+  end
+
+  defp _for_uri([], s, answer) do
+    HashDict.get(s, "", answer)
+  end
+  defp _for_uri("", s, answer) do
+    _for_uri([], s, answer)
+  end
+  defp _for_uri(["" | rest], s, answer) do
+    answer = case HashDict.get(s, "") do
+               [] -> answer
+               instances -> instances
+             end
+    _for_uri(rest, s, answer)
+  end
+  defp _for_uri([root | []], s, answer) do
+    node_for_root = HashDict.get(s, root, HashDict.new)
+    _for_uri("", node_for_root, answer)
+  end
+  defp _for_uri([root | rest], s, answer) do
+    node_for_root = HashDict.get(s, root, HashDict.new)
+    _for_uri(rest, node_for_root, answer)
   end
 end
