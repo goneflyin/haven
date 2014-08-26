@@ -11,11 +11,11 @@ defmodule IndexTest do
     {:ok, index: index}
   end
 
-  test "getting service for name when empty should return empty list", %{index: index} do
+  test "getting service for name when empty should return nil", %{index: index} do
     assert(Index.get_service_for_name(index, "not_there_svc") == nil)
   end
 
-  test "getting service by uri when empty should return empty list", %{index: index} do
+  test "getting service by uri when empty should return nil", %{index: index} do
     assert(Index.get_service_for_uri(index, "/coll") == nil)
   end
 
@@ -24,6 +24,7 @@ defmodule IndexTest do
 
     assert(Index.get_service_for_name(index, "coll_svc") == @coll_svc)
     assert(Index.get_service_for_uri(index, "/collections") == @coll_svc)
+    assert(Index.get_service_for_location(index, "1.4.9.16", 1234) == @coll_svc)
   end
 
   # test "adding same service twice only creates single entry" do

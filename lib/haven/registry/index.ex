@@ -15,6 +15,10 @@ defmodule Haven.Registry.Index do
     HashDict.get(names, name)
   end
 
+  def get_service_for_location(%Index{locations: locations}, host, port) do
+    HashDict.get(locations, "#{host}:#{port}")
+  end
+
   def get_service_for_uri(index, uri) do
     case for_uri(uri, index.uris) do
       [] -> nil
