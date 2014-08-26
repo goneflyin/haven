@@ -22,7 +22,7 @@ defmodule IndexTest do
   test "service is returned once added", %{index: index} do
     index = Index.add_service(index, @coll_svc)
 
-    # assert(Index.get_service_for_name(index, "coll_svc") == @coll_svc)
+    assert(Index.get_service_for_name(index, "coll_svc") == @coll_svc)
     assert(Index.get_service_for_uri(index, "/collections") == @coll_svc)
   end
 

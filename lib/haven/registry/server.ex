@@ -1,3 +1,4 @@
+require Logger
 require IEx
 
 defmodule Haven.Registry.Server do
@@ -124,6 +125,7 @@ defmodule Haven.Registry.Server do
 
 
   def add_for_uri(uri, handler, s) do
+    Logger.debug "add_for_uri--uri: #{inspect uri} handler: #{inspect handler} index: #{inspect s}"
     String.split(uri, "/", trim: true)
       |> _add_for_uri(handler, s)
   end
