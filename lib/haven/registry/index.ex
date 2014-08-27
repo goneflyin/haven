@@ -74,7 +74,6 @@ defmodule Haven.Registry.Index do
     end
   end
 
-
   defp for_uri(uri, index) when is_binary(uri) do
     _for_uri(String.split(uri, "/", trim: true), index, [])
   end
@@ -96,7 +95,7 @@ defmodule Haven.Registry.Index do
     _for_uri(rest, index, answer)
   end
   defp _for_uri([root | []], index, answer) do
-    node_for_root = HashDict.get(index, root, HashDict.new)
+    node_for_root = HashDict.get(index, root, index)
     _for_uri("", node_for_root, answer)
   end
   defp _for_uri([root | rest], index, answer) do
