@@ -2,7 +2,7 @@ defmodule Haven.Monitor.Supervisor do
   use Supervisor
 
   def start_link() do
-    { :ok, sup } = :supervisor.start_link({:local, :mon_sup}, __MODULE__, [])
+    { :ok, _sup } = :supervisor.start_link({:local, :mon_sup}, __MODULE__, [])
   end
 
   def init(_) do
@@ -19,10 +19,10 @@ defmodule Haven.Monitor.Supervisor do
   def pid_for_name(name, []) do
     { :none, "No service found for name '#{name}'" }
   end
-  def pid_for_name(name, [{name, pid, _, _} | monitors]) do
+  def pid_for_name(name, [{name, pid, _, _} | _monitors]) do
     { :ok, pid }
   end
-  def pid_for_name(name, [monitor | monitors]) do
+  def pid_for_name(name, [_monitor | monitors]) do
     pid_for_name(name, monitors)
   end
 end

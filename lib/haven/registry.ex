@@ -79,13 +79,13 @@ defmodule Haven.Registry do
   def handle_cast(:clear, _) do
     { :noreply, %{by_uri: HashDict.new} }
   end
-  def handle_cast({ :add, service = %Service{name: svc_name, uris: svc_uris} }, state) do
+  def handle_cast({ :add, service = %Service{} }, state) do
     # register(service)
     index = Index.add_service(%Index{uris: state.by_uri}, service)
     { :noreply, %{state|by_uri: index.uris}}
   end
 
-  def terminate(reason, state) do
+  def terminate(_reason, state) do
     Haven.Registry.Store.store_registry(state.by_uri)
   end
 

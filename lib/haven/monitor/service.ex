@@ -54,7 +54,7 @@ defmodule Haven.Monitor.Service do
 
     # IO.puts "Calling -- Service.Monitor#register_uris(#{inspect state.uris}, #{inspect instance.uris})"
     { _, uris } = Enum.map_reduce(instance.uris, HashSet.new, fn(uri, set) -> { uri, HashSet.put(set, uri) } end)
-    { :ok, service_uris } = register_uris(state.uris, uris)
+    { :ok, _service_uris } = register_uris(state.uris, uris)
     { :reply, { :ok }, state }
   end
 

@@ -22,7 +22,7 @@ defmodule Haven.Registry.Index do
   def get_service_for_uri(index, uri) do
     case for_uri(uri, index.uris) do
       [] -> nil
-      [service|tail] -> service
+      [service|_] -> service
     end
   end
 
