@@ -6,7 +6,7 @@ defmodule Haven.Registry.SubSupervisor do
   end
 
   def init(registry_store) do
-    children = [ worker(Haven.Registry.Server, [registry_store]) ]
+    children = [ worker(Haven.Registry, [registry_store]) ]
     supervise children, strategy: :one_for_one
   end
 end

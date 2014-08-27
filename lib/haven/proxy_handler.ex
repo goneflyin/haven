@@ -9,12 +9,16 @@ defmodule ProxyHandler do
   @filter_headers ["Content-Length"]
 
   def handle(conn) do
-    Registry.get_services_by_uri(conn.path_info) |> _handle(conn)
+    Registry.get_service_for_uri(conn.path_info)
+    |> _handle(conn)
   end
 
-  def _handle([%Service{host: host, port: port} | _], conn) do
+  def _handle(%Service{host: host, port: port}, conn) do
     # TODO: handle multiple services (load balancing)
-    conn = conn |> Conn.fetch_cookies |> Conn.fetch_params
+    conn = conn
+    |> Conn.fetch_cookies
+    |> Conn.fetch_params
+
     url = '#{conn.scheme}://#{host}:#{port}/#{conn.path_info}?#{conn.query_string}'
     headers = convert_keys_to_atoms conn.req_headers
 
