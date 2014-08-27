@@ -1,3 +1,5 @@
+require Logger
+
 defmodule RegistrarRouter do
   use Jazz
   use Plug.Router
@@ -21,7 +23,8 @@ defmodule RegistrarRouter do
 
   get "/:name" do
     json = Registry.get_service_for_name(name) |> Registry.to_hash |> JSON.encode!
-    conn.resp 200, json
+    Logger.debug("get /:name --> json: #{inspect json}")
+    send_resp(conn, 200, json)
   end
 
   defp add_service(service) do

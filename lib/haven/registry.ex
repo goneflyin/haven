@@ -57,36 +57,36 @@ defmodule Haven.Registry do
   # GenServer Implementation
   ##########################
   def init(_) do
-    services_by_uri = Haven.Registry.Store.fetch_registry()
-    { :ok, %{by_uri: services_by_uri} }
+    { :ok, Haven.Registry.Store.fetch_registry() }
   end
 
   def handle_call({:get_by_name, svc_name}, _from, state) do
-    svc = Index.get_service_for_name(%Index{names: state.by_name}, svc_name)
+    svc = Index.get_service_for_name(state, svc_name)
     { :reply, svc, state }
   end
   def handle_call({:get_by_uri, uri}, _from, state) do
-    svc = Index.get_service_for_uri(%Index{uris: state.by_uri}, uri)
+    svc = Index.get_service_for_uri(state, uri)
     { :reply, svc, state }
   end
   def handle_call(:dump, _from, state) do
-    { :reply, state.by_uri, state }
+    { :reply, state, state }
   end
   def handle_call(unknown, _from, state) do
     { :reply, {:error, "Unable to handle_call for #{unknown}"}, state }
   end
 
   def handle_cast(:clear, _) do
-    { :noreply, %{by_uri: HashDict.new} }
+    {:ok, index} = Index.create
+    { :noreply, index }
   end
   def handle_cast({ :add, service = %Service{} }, state) do
     # register(service)
-    index = Index.add_service(%Index{uris: state.by_uri}, service)
-    { :noreply, %{state|by_uri: index.uris}}
+    state = Index.add_service(state, service)
+    { :noreply, state}
   end
 
   def terminate(_reason, state) do
-    Haven.Registry.Store.store_registry(state.by_uri)
+    Haven.Registry.Store.store_registry(state)
   end
 
   # TODO: Move to/from hash functions to Service module

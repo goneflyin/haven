@@ -1,11 +1,11 @@
 defmodule Haven.Registry.Store do
   use GenServer
 
-  ##############
-  # External API
-  ##############
+  alias Haven.Registry.Index
+
   def start_link() do
-    Agent.start_link(fn -> HashDict.new end, name: __MODULE__)
+    {:ok, index} = Index.create()
+    Agent.start_link(fn -> index end, name: __MODULE__)
   end
 
   def store_registry(registry) do
