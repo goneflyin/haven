@@ -30,27 +30,27 @@ defmodule Haven.Registry do
     # Haven.Registry.Server.start_link(stack) function to START the worker.
     # Prefacing the args with {:local, :registry} causes the server to be
     # registered as :registry in the local node.
-    :gen_server.start_link({ :local, :registry }, __MODULE__, store_pid, [])
+    GenServer.start_link( __MODULE__, store_pid, name: :registry)
   end
 
   def clear do
-    :gen_server.cast(:registry, :clear)
+    GenServer.cast(:registry, :clear)
   end
 
   def add_service(svc = %Service{}) do
-    :gen_server.cast(:registry, { :add, svc })
+    GenServer.cast(:registry, { :add, svc })
   end
 
   def get_service_for_name(name) do
-    :gen_server.call(:registry, { :get_by_name, name })
+    GenServer.call(:registry, { :get_by_name, name })
   end
 
   def get_service_for_uri(url) do
-    :gen_server.call(:registry, { :get_by_uri, url })
+    GenServer.call(:registry, { :get_by_uri, url })
   end
 
   def dump do
-    :gen_server.call(:registry, :dump)
+    GenServer.call(:registry, :dump)
   end
 
   ##########################
