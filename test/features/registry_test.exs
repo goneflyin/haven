@@ -13,7 +13,7 @@ defmodule RegistryTest do
   # end
 
   test "getting service by uri when empty should return empty list" do
-    assert(Registry.get_services_by_uri("/coll") == [])
+    assert(Registry.get_service_for_uri("/coll") == nil)
   end
 
   # test "service is returned once added" do

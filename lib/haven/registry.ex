@@ -13,12 +13,31 @@ defmodule Haven.Registry do
     Instance[host=1.2.3.4, port=9001]
   """
 
-  defmodule Service do
-    defstruct name: nil, uris: [], host: "127.0.0.1", port: 8888
-  end
-
   alias Haven.Registry.Index
   alias Haven.Registry.Service
+
+  defmodule Service do
+    defstruct name: nil, uris: [], host: "127.0.0.1", port: 8888
+
+    def from_hash(svc_hash) do
+      %Service{name: svc_hash["service"],
+               uris: svc_hash["uris"],
+               host: svc_hash["host"],
+               port: svc_hash["port"]}
+    end
+
+    def to_hash([service | rest]) do
+      [to_hash(service) | to_hash(rest)]
+    end
+    def to_hash([]), do: []
+    def to_hash(service = %Service{}) do
+      HashDict.new
+      |> HashDict.put(:service, service.name)
+      |> HashDict.put(:uris, service.uris)
+      |> HashDict.put(:host, service.host)
+      |> HashDict.put(:port, service.port)
+    end
+  end
 
   ##########################
   # External API
@@ -86,27 +105,7 @@ defmodule Haven.Registry do
   end
 
   def terminate(_reason, state) do
-    Haven.Registry.Store.store_registry(state)
-  end
-
-  # TODO: Move to/from hash functions to Service module
-  def from_hash(svc_hash) do
-    %Service{name: svc_hash["service"],
-                uris: svc_hash["uris"],
-                host: svc_hash["host"],
-                port: svc_hash["port"]}
-  end
-
-  def to_hash([service | rest]) do
-    [to_hash(service) | to_hash(rest)]
-  end
-  def to_hash([]), do: []
-  def to_hash(service = %Service{}) do
-    HashDict.new
-      |> HashDict.put(:service, service.name)
-      |> HashDict.put(:uris, service.uris)
-      |> HashDict.put(:host, service.host)
-      |> HashDict.put(:port, service.port)
+    Haven.Registry.Store.store_registry(state.by_uri)
   end
 end
 
@@ -114,19 +113,19 @@ end
 # Still valid and referenced classes do exist, but rework in registry took
 # precedence.
 
-  # def register(service = %Service{name: svc_name}) do
-  #   { :ok, monitor_pid } = find_or_create_monitor(svc_name)
-  #   Haven.Monitor.Service.register(monitor_pid, service)
-  #   :ok
-  # end
+# def register(service = %Service{name: svc_name}) do
+#   { :ok, monitor_pid } = find_or_create_monitor(svc_name)
+#   Haven.Monitor.Service.register(monitor_pid, service)
+#   :ok
+# end
 
-  # def find_or_create_monitor(name) do
-  #   case Haven.Monitor.Supervisor.start_monitor(name) do
-  #     { :ok, monitor_pid} ->
-  #       { :ok, monitor_pid }
-  #     { :error, { :already_started, monitor_pid } } ->
-  #       { :ok, monitor_pid }
-  #     { :error, error } ->
-  #       { :error, error }
+# def find_or_create_monitor(name) do
+#   case Haven.Monitor.Supervisor.start_monitor(name) do
+#     { :ok, monitor_pid} ->
+#       { :ok, monitor_pid }
+#     { :error, { :already_started, monitor_pid } } ->
+#       { :ok, monitor_pid }
+#     { :error, error } ->
+#       { :error, error }
   #   end
   # end

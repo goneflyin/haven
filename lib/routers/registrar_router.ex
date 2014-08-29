@@ -28,7 +28,7 @@ defmodule RegistrarRouter do
   end
 
   defp add_service(service) do
-    Registry.from_hash(service)
+    Registry.Service.from_hash(service)
       |> Registry.add_service
   end
 
