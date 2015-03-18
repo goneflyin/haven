@@ -1,5 +1,6 @@
 # Haven
-
+##### *A place to find REST!*
+----
 Haven is an Elixir-based, software-driven REST-ful router to simplify
 the job of maintaining your infrastructure. It provides the following
 features:
